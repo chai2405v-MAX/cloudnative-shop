@@ -1,15 +1,26 @@
 from flask import Flask
+import urllib.request
+import json
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
-    return """
-    <h1>CloudNative Shop</h1>
-    <p>Frontend service is running.</p>
-    <p>Product API: http://localhost:5001/products</p>
-    <p>Order API: http://localhost:5002/orders</p>
-    """
+    products_response = urllib.request.urlopen(
+        "http://product-api:5001/products"
+    )
+    products = json.loads(products_response.read().decode())
+
+    orders_response = urllib.request.urlopen(
+        "http://order-api:5002/orders"
+    )
+    orders = json.loads(orders_response.read().decode())
+
+    return {
+        "service": "CloudNative Shop Frontend",
+        "products": products,
+        "orders": orders
+    }
 
 @app.route("/health", methods=["GET"])
 def health():
