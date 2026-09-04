@@ -1,0 +1,51 @@
+services:
+  product-api:
+    image: cloudnative-shop-product-api:v1
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5001/health')"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  order-api:
+    image: cloudnative-shop-order-api:v1
+    ports:
+      - "5002:5002"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5002/health')"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  frontend:
+    image: cloudnative-shop-frontend:v2
+    ports:
+      - "5003:5003"
+    healthcheck:
+      test:
+          [
+            "CMD",
+            "python",
+            "-c",
+            "import urllib.request; urllib.request.urlopen('http://localhost:5003/health')"
+          ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      product-api:
+        condition: service_healthy
+      order-api:
+        condition: service_healthy
